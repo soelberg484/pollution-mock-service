@@ -5,12 +5,21 @@ const App: React.FC = () => {
 const [activeStream, setActiveStream] = useState(false)
 const [aqiMock, setAqiMock] = useState(0)
 const [streamMsg, setStreamMsg] = useState("")
+const url = "http://localhost:8081/visualIndicator"
 
 const generateRandomNumber = (interval: number) => {
     if(interval >= 0){
-    const randomNo = Math.random() * 400
-    console.log(randomNo)
-    setAqiMock(randomNo)
+    setAqiMock(Math.random() * 400)
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        aqi: Math.random() * 400,
+      }),
+    });
     setTimeout(() => generateRandomNumber(interval - 1), 1000)
     }
     else {
