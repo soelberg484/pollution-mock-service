@@ -1,48 +1,94 @@
 import React, { useState, useEffect } from 'react';
 
 
-const App: React.FC = () => {
-const [activeStream, setActiveStream] = useState(false)
-const [aqiMock, setAqiMock] = useState(0)
-const [streamMsg, setStreamMsg] = useState("")
-const url = "http://localhost:8081/visualIndicator"
 
-const generateRandomNumber = (interval: number) => {
-    if(interval >= 0){
-    setAqiMock(Math.random() * 400)
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        aqi: Math.random() * 400,
-      }),
-    });
-    setTimeout(() => generateRandomNumber(interval - 1), 1000)
-    }
-    else {
-      setStreamMsg("Stream stopping...")
-      setTimeout(() => {
-        setActiveStream(false)},
-        3000)
-    }
+interface AqiData {
+  id: number
+  longtude: number
+  latitude: number
+  datetime: string
+  aqiLvl: number
 }
 
-  // Similar to componentDidMount and componentDidUpdate:
+
+const App: React.FC = () => {
+  const [activeStream, setActiveStream] = useState(false)
+  const [aqiMock, setAqiMock] = useState<AqiData>({ id: 0, longtude: 0, latitude: 0, datetime: "", aqiLvl: 0 })
+  const [streamMsg, setStreamMsg] = useState(<></>)
+  const url = "http://localhost:8081/visualIndicator"
+
+  const generateRandomDate = (interval: number) => {
+    if (interval >= 0) {
+      const data: AqiData = {
+        id: generateRandomId(),
+        longtude: generateRandomLongtude(),
+        latitude: generateRandomLatitude(),
+        datetime: new Date().toLocaleString(),
+        aqiLvl: generateRandomPollutionLvl()
+      }
+      setAqiMock(data);
+
+      fetch(url, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: data.id,
+          longtude: data.longtude,
+          latitude: data.latitude,
+          datetime: data.datetime,
+          aqi: data.aqiLvl
+        }),
+      });
+      setTimeout(() => generateRandomDate(interval - 1), 1000)
+    }
+    else {
+      setStreamMsg(<h3>Stream stopping...</h3>)
+      setTimeout(() => { setActiveStream(false)}, 3000)
+    }
+  }
+
+  const generateRandomPollutionLvl = () => {
+    const random = Math.random() * 400
+    return random
+  }
+
+  const generateRandomLongtude = () => {
+    const random = Math.random() * 360 - 180
+    return random
+  }
+
+  const generateRandomLatitude = () => {
+    const random = Math.random() * 180 - 90
+    return random
+  }
+
+  const generateRandomId = () => {
+    const random = Math.floor(Math.random() * 101);
+    return random
+  }
+
   useEffect(() => {
     // Update the document title using the browser API
-    setStreamMsg('Stream is running...  (' + aqiMock +')');
+    setStreamMsg(<>
+      <h3>Stream is running...</h3>
+      <h4>Visual indicator: {aqiMock.id} </h4>
+      <h4>Cordinates: Longtude: {aqiMock.longtude} , Latitude: {aqiMock.latitude}</h4>
+      <h4>Datetime: {aqiMock.datetime}</h4>
+      <h4>Aqi level: {aqiMock.aqiLvl}</h4> </>);
   }, [aqiMock])
+  
+
   return (
     <div>
       <h1>Pollution mock service</h1>
       {activeStream && <h3>{streamMsg}</h3>}
       <button onClick={() => {
         setActiveStream(true);
-        generateRandomNumber(10)}}>Start stream</button>
-      <button onClick={() => setActiveStream(false)}>Stop stream</button>
+        generateRandomDate(10)
+      }}>Start stream</button>
     </div>
   )
 }
