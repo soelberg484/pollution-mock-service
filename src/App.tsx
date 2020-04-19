@@ -84,7 +84,7 @@ const App: React.FC = () => {
   return (
     <div>
       <h1>Pollution mock service</h1>
-      {activeStream && <h3>{streamMsg}</h3>}
+      {activeStream && streamMsg}
       <button onClick={() => {
         setActiveStream(true);
         generateRandomDate(10)
