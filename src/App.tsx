@@ -52,7 +52,7 @@ const App: React.FC = () => {
   }
 
   const generateRandomPollutionLvl = () => {
-    const random = Math.random() * 400
+    const random = Math.floor(Math.random() * 400)
     return random
   }
 
