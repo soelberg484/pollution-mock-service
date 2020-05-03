@@ -15,7 +15,7 @@ const App: React.FC = () => {
   const [activeStream, setActiveStream] = useState(false)
   const [aqiMock, setAqiMock] = useState<AqiData>({ id: 0, longtude: 0, latitude: 0, datetime: "", aqiLvl: 0 })
   const [streamMsg, setStreamMsg] = useState(<></>)
-  const url = "http://localhost:8081/visualIndicator"
+  const url = "http://localhost:8081/pollutionDataInput"
 
   const generateRandomDate = (interval: number) => {
     if (interval >= 0) {
@@ -36,10 +36,11 @@ const App: React.FC = () => {
         },
         body: JSON.stringify({
           id: data.id,
-          longtude: data.longtude,
+          longitude: data.longtude,
           latitude: data.latitude,
           datetime: data.datetime,
-          aqi: data.aqiLvl
+          aqi: data.aqiLvl,
+          eventType: "aqi"
         }),
       });
       setTimeout(() => generateRandomDate(interval - 1), 1000)
